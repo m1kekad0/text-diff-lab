@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 
 export const sourceDirectory = fileURLToPath(new URL('../src/', import.meta.url));
 export const outputDirectory = fileURLToPath(new URL('../dist/', import.meta.url));
-export const assets = ['index.html', 'styles.css'];
+export const assets = ['index.html', 'styles.css', 'app.mjs', 'diff.mjs'];
 
 export async function build(destination = outputDirectory) {
   await mkdir(destination, { recursive: true });
@@ -15,5 +15,5 @@ export async function build(destination = outputDirectory) {
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   await build();
-  console.log('Built 2 static assets in dist/.');
+  console.log(`Built ${assets.length} static assets in dist/.`);
 }
