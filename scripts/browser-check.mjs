@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
-import { mkdir, mkdtemp, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
+import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { build } from './build.mjs';
+import { assets, build } from './build.mjs';
 import { createStaticServer } from './serve.mjs';
 import { compareTexts } from '../src/diff.mjs';
 
@@ -13,13 +14,27 @@ const moduleName = process.env.PLAYWRIGHT_MODULE || 'playwright';
 const { chromium } = await import(moduleName.startsWith('.') || moduleName.startsWith('/') ? pathToFileURL(resolve(moduleName)).href : moduleName);
 const directory = await mkdtemp(join(tmpdir(), 'text-diff-browser-'));
 const servers = [];
+const pagesCheck = process.env.PAGES_CHECK === '1';
+const subpath = '/text-diff-lab/';
+const servedRequests = [];
 let browser;
 async function serve(source) {
-  const server = createStaticServer(source);
+  // Pages QA deliberately omits every custom response header from serve.mjs.
+  const server = pagesCheck ? createServer(async (request, response) => {
+    servedRequests.push({ path: request.url, method: request.method });
+    const asset = request.url === subpath ? 'index.html' : request.url.slice(subpath.length);
+    if (!request.url.startsWith(subpath) || !assets.includes(asset) || request.method !== 'GET') {
+      response.writeHead(404).end();
+      return;
+    }
+    const types = { html: 'text/html', css: 'text/css', mjs: 'text/javascript' };
+    response.writeHead(200, { 'Content-Type': types[asset.split('.').pop()] });
+    response.end(await readFile(join(source, asset)));
+  }) : createStaticServer(source);
   servers.push(server);
   server.listen(0, '127.0.0.1');
   await once(server, 'listening');
-  return `http://127.0.0.1:${server.address().port}`;
+  return `http://127.0.0.1:${server.address().port}${pagesCheck ? subpath : ''}`;
 }
 
 const sample = ['小さな庭のメモ\n種をまく\n水をやる\n収穫を待つ', '小さな庭のメモ\n苗を植える\n水をやる\n日当たりを確認する\n収穫を待つ'];
@@ -31,12 +46,23 @@ try {
   const url = await serve(directory);
   browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, locale: 'ja-JP' });
+  const externalRoutes = [];
+  if (pagesCheck) await context.route('**/*', (route) => {
+    if (new URL(route.request().url()).origin !== new URL(url).origin) {
+      externalRoutes.push(route.request().url());
+      return route.abort();
+    }
+    return route.continue();
+  });
   const page = await context.newPage();
   const requests = [];
+  const assetResponses = [];
   const exceptions = [];
   page.on('request', (request) => requests.push({ url: request.url(), method: request.method() }));
+  page.on('response', (response) => assetResponses.push({ path: new URL(response.url()).pathname, status: response.status(), type: response.headers()['content-type'] }));
   page.on('pageerror', (error) => exceptions.push(error.message));
-  await page.goto(url);
+  const response = await page.goto(url);
+  if (pagesCheck) assert.equal(response.headers()['content-security-policy'], undefined);
   await page.waitForFunction(() => document.querySelector('#original-count').textContent.includes('20,000文字'));
   const fill = async (a, b) => {
     await page.locator('#original').fill(a);
@@ -97,7 +123,8 @@ try {
     assert.match(await page.locator('#comparison-status').textContent(), /両方の入力が空/);
   }
   assert.deepEqual(exceptions, []);
-  assert.ok(requests.every((request) => request.method === 'GET' && request.url.startsWith(`${url}/`) && ['/', '/styles.css', '/app.mjs', '/diff.mjs', '/favicon.ico'].includes(new URL(request.url).pathname)));
+  const prefix = pagesCheck ? subpath : '/';
+  assert.ok(requests.every((request) => request.method === 'GET' && new URL(request.url).origin === new URL(url).origin && [prefix, ...['styles.css', 'app.mjs', 'diff.mjs'].map((asset) => `${prefix}${asset}`), '/favicon.ico'].includes(new URL(request.url).pathname)));
   const requestCount = requests.length;
   await page.locator('#sample').click();
   await compare();
@@ -112,19 +139,80 @@ try {
     await page.keyboard.press('Tab');
     assert.equal(await page.evaluate(() => document.activeElement.id), id, 'keyboard focus order');
   }
+  if (pagesCheck) {
+    assert.equal(await page.locator('label[for="original"]').count(), 1);
+    assert.equal(await page.locator('label[for="updated"]').count(), 1);
+    assert.equal(await page.locator('#comparison-status').getAttribute('role'), 'status');
+    for (const [asset, type] of [['', 'text/html'], ['styles.css', 'text/css'], ['app.mjs', 'text/javascript'], ['diff.mjs', 'text/javascript']]) {
+      assert.ok(assetResponses.some((response) => response.path === `${subpath}${asset}` && response.status === 200 && response.type.startsWith(type)), 'project assets load with correct types');
+    }
+    const beforeProbes = servedRequests.length;
+    await page.evaluate(async () => {
+      window.__violations = [];
+      document.addEventListener('securitypolicyviolation', (event) => window.__violations.push(event.effectiveDirective));
+      // Synthetic probes exercise the parsed meta policy, not Playwright's privileged evaluation.
+      const script = document.createElement('script');
+      script.textContent = 'window.__cspInlineExecuted = true';
+      document.head.append(script);
+      const external = document.createElement('script');
+      external.src = 'https://example.invalid/csp-script.js';
+      document.head.append(external);
+      const style = document.createElement('style');
+      style.textContent = 'body { display: none; }';
+      document.head.append(style);
+      const css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = 'https://example.invalid/csp-style.css';
+      document.head.append(css);
+      const image = document.createElement('img');
+      image.src = 'https://example.invalid/csp-image.png';
+      document.body.append(image);
+      const base = document.createElement('base');
+      base.href = 'https://example.invalid/';
+      document.head.append(base);
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/csp-form-probe';
+      document.body.append(form);
+      form.submit();
+      await Promise.all(['/csp-fetch-probe', 'https://example.invalid/csp-fetch-probe'].map((target) => fetch(target, { method: 'POST', body: 'synthetic-csp-probe' }).catch(() => {})));
+      await new Promise((resolve) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onerror = resolve;
+        xhr.onload = resolve;
+        xhr.open('POST', '/csp-xhr-probe');
+        xhr.send('synthetic-csp-probe');
+      });
+      navigator.sendBeacon('/csp-beacon-probe', 'synthetic-csp-probe');
+      await new Promise((resolve) => {
+        const socket = new WebSocket(location.origin.replace('http:', 'ws:') + '/csp-ws-probe');
+        socket.onerror = resolve;
+      });
+      for (const element of [script, external, style, css, image, base, form]) element.remove();
+    });
+    await page.waitForFunction(() => ['script-src-elem', 'style-src-elem', 'img-src', 'base-uri', 'form-action', 'connect-src'].every((directive) => window.__violations.includes(directive)));
+    assert.equal(await page.evaluate(() => window.__cspInlineExecuted), undefined);
+    assert.equal(await page.evaluate(() => document.baseURI), url);
+    assert.equal(await page.locator('body').isVisible(), true);
+    assert.equal(servedRequests.length, beforeProbes, 'CSP probes never reached the static server');
+    assert.deepEqual(externalRoutes, [], 'CSP blocked external probes before network interception');
+    assert.deepEqual(exceptions, []);
+    console.log('Pages subpath: headerless assets, operations, memory reset, keyboard/labels and meta CSP probes passed; no input requests reached the server.');
+  }
   await context.close();
 
   // Optional paired captures: the baseline inputs are disabled, so set only synthetic values.
   if (process.env.CAPTURE_DIR && process.env.BASE_SRC) {
     await mkdir(process.env.CAPTURE_DIR, { recursive: true });
     const baseUrl = await serve(process.env.BASE_SRC);
+    let baselineScreenshot;
     for (const [name, viewport] of [['desktop', { width: 1440, height: 1000 }], ['mobile', { width: 390, height: 844 }]]) {
       for (const [state, fixture] of [['normal', sample], ['error', errorFixture], ['empty', ['', '']]]) {
         for (const [revision, address] of [['before', baseUrl], ['after', url]]) {
           const captureContext = await browser.newContext({ viewport, locale: 'ja-JP' });
           const capturePage = await captureContext.newPage();
           await capturePage.goto(address);
-          if (revision === 'before') {
+          if (revision === 'before' && !pagesCheck) {
             await capturePage.evaluate(([a, b]) => { document.querySelector('#original').value = a; document.querySelector('#updated').value = b; }, fixture);
           } else {
             await capturePage.locator('#original').fill(fixture[0]);
@@ -139,7 +227,9 @@ try {
           assert.equal(await capturePage.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'no horizontal overflow');
           await capturePage.evaluate(() => window.scrollTo(0, 0));
           await capturePage.locator('textarea').evaluateAll((fields) => fields.forEach((field) => { field.scrollTop = 0; field.scrollLeft = 0; }));
-          await capturePage.screenshot({ path: join(process.env.CAPTURE_DIR, `mvp-${name}-${state}-${revision}.png`), fullPage: true });
+          const screenshot = await capturePage.screenshot({ path: join(process.env.CAPTURE_DIR, `${pagesCheck ? 'pages' : 'mvp'}-${name}-${state}-${revision}.png`), fullPage: true });
+          if (pagesCheck && revision === 'before') baselineScreenshot = screenshot;
+          if (pagesCheck && revision === 'after') assert.deepEqual(screenshot, baselineScreenshot, 'same-condition before/after pixels unchanged');
           await captureContext.close();
         }
       }

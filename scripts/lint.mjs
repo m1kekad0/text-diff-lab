@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const files = ['README.md', 'AGENTS.md', 'LICENSE', '.gitignore', 'package.json', 'package-lock.json', '.github/workflows/ci.yml'];
+const files = ['README.md', 'AGENTS.md', 'LICENSE', '.gitignore', 'package.json', 'package-lock.json', '.github/workflows/ci.yml', '.github/workflows/pages.yml', 'docs/pages-hosting.md'];
 for (const directory of ['scripts', 'test', 'src']) {
   for (const file of await readdir(resolve(root, directory))) files.push(`${directory}/${file}`);
 }
