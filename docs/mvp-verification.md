@@ -12,7 +12,7 @@
 - build済みページで空・同一・片側空・挿入・削除・置換・繰り返し行・CRLF・末尾改行・100行・20,000文字と、左右それぞれ101行・20,001文字のエラーを確認。
 - サンプル→比較→再比較→編集→クリア→空比較を3回繰り返し、古い結果・エラーが消えること、Enterで比較できること、Tab順序、結果見出しとエラー入力へのfocusを確認。
 - HTML風の合成入力が文字のまま表示され、script/img要素や実行フラグを生成しないことを確認。runtime例外0。
-- 観測した要求はローカルの静的assetのみ。サンプル・比較・クリア操作で新しい要求0。localStorage、sessionStorage、cookie、IndexedDB、Cache Storageは空。再読込で入力が空になることを確認。
+- 観測した要求はローカルの静的assetのみ。サンプル・比較・クリア操作で新しい要求0。localStorage、sessionStorage、cookie、IndexedDB、Cache Storageは空。再読込後の空入力も観測したが、当時のスクリプトは再読込前にクリアしていたため、非空入力が再読込で消えることは証明していなかった。[reload/reset回帰チェックの検証と訂正](browser-reset-verification.md)を参照。
 - desktop 1440×1000 / mobile 390×844で通常・エラー・空入力を操作し、横にはみ出さないことを確認。
 
 ローカル検証は `scripts/browser-check.mjs` で再実行できます。PlaywrightとChromiumは別途用意する検証ツールで、アプリ・CIには追加していません。
