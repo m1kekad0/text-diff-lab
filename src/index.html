@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="text-diff-lab はブラウザ内のテキスト比較ツールを育てるプロジェクトです。現在は開発中の画面です。">
+    <title>text-diff-lab — 開発中</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="page">
+      <header class="site-header">
+        <a class="brand" href="./" aria-label="text-diff-lab ホーム">
+          <span class="brand-mark" aria-hidden="true"><span>−</span><span>+</span></span>
+          <span>text-diff-lab</span>
+        </a>
+        <span class="version">PHASE 1.0 <span class="status-dot" aria-hidden="true"></span> 開発中</span>
+      </header>
+
+      <main>
+        <section class="intro" aria-labelledby="page-title">
+          <div>
+            <p class="eyebrow">A LITTLE SPACE FOR TEXT</p>
+            <h1 id="page-title">違いを、<br>一行ずつ。</h1>
+          </div>
+          <div class="intro-copy">
+            <p>ふたつの文章を並べて、<br>変わったところを見つける。</p>
+            <p class="muted">ブラウザ内で完結する、小さな比較ツールを開発しています。</p>
+          </div>
+        </section>
+
+        <section class="workspace" aria-labelledby="workspace-title" aria-describedby="bootstrap-note">
+          <div class="workspace-heading">
+            <h2 id="workspace-title">テキストを比較</h2>
+            <span class="workspace-caption">01 / WORKSPACE</span>
+          </div>
+          <div class="notice" id="bootstrap-note">
+            <span class="notice-tag">準備中</span>
+            <p>今は画面の骨組みです。入力と比較の機能は、次のバージョンで追加します。</p>
+          </div>
+          <div class="editors">
+            <div class="editor">
+              <div class="editor-heading"><label for="original"><span class="panel-key">A</span> 変更前</label><span class="panel-caption">ORIGINAL</span></div>
+              <textarea id="original" disabled placeholder="ここに変更前のテキストを入力する予定です。" aria-describedby="bootstrap-note" spellcheck="false"></textarea>
+              <p class="editor-footer">入力機能は未実装</p>
+            </div>
+            <div class="editor">
+              <div class="editor-heading"><label for="updated"><span class="panel-key">B</span> 変更後</label><span class="panel-caption">UPDATED</span></div>
+              <textarea id="updated" disabled placeholder="ここに変更後のテキストを入力する予定です。" aria-describedby="bootstrap-note" spellcheck="false"></textarea>
+              <p class="editor-footer">入力機能は未実装</p>
+            </div>
+          </div>
+          <div class="toolbar">
+            <div class="secondary-actions"><button type="button" disabled>サンプル</button><button type="button" disabled>クリア</button></div>
+            <button class="compare-button" type="button" disabled>比較する <span aria-hidden="true">↗</span></button>
+          </div>
+        </section>
+
+        <section class="next-step" aria-labelledby="next-title">
+          <p class="eyebrow">NEXT / MVP</p>
+          <h2 id="next-title">追加と削除を、わかりやすく。</h2>
+          <p>行ごとの違いを、色・記号・文字で伝える予定です。<br class="desktop-break">差分計算と結果表示は、まだ実装していません。</p>
+        </section>
+      </main>
+
+      <footer class="site-footer"><span>text-diff-lab <span class="footer-divider">/</span> 小さくつくって、育てる。</span><span>© 2026 m1kekad0 · MIT</span></footer>
+    </div>
+  </body>
+</html>
