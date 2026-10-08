@@ -3,9 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="text-diff-lab はブラウザ内のテキスト比較ツールを育てるプロジェクトです。現在は開発中の画面です。">
-    <title>text-diff-lab — 開発中</title>
+    <meta name="description" content="ふたつのテキストをブラウザ内で行単位に比較。入力は保存・送信しません。">
+    <title>text-diff-lab — 行単位のテキスト比較</title>
     <link rel="stylesheet" href="./styles.css">
+    <script type="module" src="./app.mjs"></script>
   </head>
   <body>
     <div class="page">
@@ -14,7 +15,7 @@
           <span class="brand-mark" aria-hidden="true"><span>−</span><span>+</span></span>
           <span>text-diff-lab</span>
         </a>
-        <span class="version">PHASE 1.0 <span class="status-dot" aria-hidden="true"></span> 開発中</span>
+        <span class="version">MVP <span class="status-dot" aria-hidden="true"></span> 行単位の比較</span>
       </header>
 
       <main>
@@ -25,41 +26,57 @@
           </div>
           <div class="intro-copy">
             <p>ふたつの文章を並べて、<br>変わったところを見つける。</p>
-            <p class="muted">ブラウザ内で完結する、小さな比較ツールを開発しています。</p>
+            <p class="muted">入力はブラウザのメモリ内で処理します。保存・送信はしません。</p>
           </div>
         </section>
 
-        <section class="workspace" aria-labelledby="workspace-title" aria-describedby="bootstrap-note">
+        <section class="workspace" aria-labelledby="workspace-title" aria-describedby="input-limits">
           <div class="workspace-heading">
             <h2 id="workspace-title">テキストを比較</h2>
             <span class="workspace-caption">01 / WORKSPACE</span>
           </div>
-          <div class="notice" id="bootstrap-note">
-            <span class="notice-tag">準備中</span>
-            <p>今は画面の骨組みです。入力と比較の機能は、次のバージョンで追加します。</p>
+          <div class="notice" id="input-limits">
+            <span class="notice-tag">入力の上限</span>
+            <p>左右それぞれ100行・20,000文字まで。入力後に「比較する」を押してください。</p>
           </div>
+          <noscript><p class="notice">比較にはJavaScriptが必要です。ブラウザで有効にしてください。</p></noscript>
           <div class="editors">
             <div class="editor">
               <div class="editor-heading"><label for="original"><span class="panel-key">A</span> 変更前</label><span class="panel-caption">ORIGINAL</span></div>
-              <textarea id="original" disabled placeholder="ここに変更前のテキストを入力する予定です。" aria-describedby="bootstrap-note" spellcheck="false"></textarea>
-              <p class="editor-footer">入力機能は未実装</p>
+              <textarea id="original" placeholder="変更前のテキストを入力" aria-describedby="input-limits original-count original-error" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+              <p class="editor-footer" id="original-count">0 / 100行 · 0 / 20,000文字</p>
+              <p class="input-error" id="original-error"></p>
             </div>
             <div class="editor">
               <div class="editor-heading"><label for="updated"><span class="panel-key">B</span> 変更後</label><span class="panel-caption">UPDATED</span></div>
-              <textarea id="updated" disabled placeholder="ここに変更後のテキストを入力する予定です。" aria-describedby="bootstrap-note" spellcheck="false"></textarea>
-              <p class="editor-footer">入力機能は未実装</p>
+              <textarea id="updated" placeholder="変更後のテキストを入力" aria-describedby="input-limits updated-count updated-error" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+              <p class="editor-footer" id="updated-count">0 / 100行 · 0 / 20,000文字</p>
+              <p class="input-error" id="updated-error"></p>
             </div>
           </div>
           <div class="toolbar">
-            <div class="secondary-actions"><button type="button" disabled>サンプル</button><button type="button" disabled>クリア</button></div>
-            <button class="compare-button" type="button" disabled>比較する <span aria-hidden="true">↗</span></button>
+            <div class="secondary-actions"><button id="sample" type="button">サンプル</button><button id="clear" type="button">クリア</button></div>
+            <button id="compare" class="compare-button" type="button">比較する <span aria-hidden="true">↗</span></button>
           </div>
         </section>
 
-        <section class="next-step" aria-labelledby="next-title">
-          <p class="eyebrow">NEXT / MVP</p>
-          <h2 id="next-title">追加と削除を、わかりやすく。</h2>
-          <p>行ごとの違いを、色・記号・文字で伝える予定です。<br class="desktop-break">差分計算と結果表示は、まだ実装していません。</p>
+        <section class="results" aria-labelledby="result-title">
+          <div class="workspace-heading">
+            <h2 id="result-title" tabindex="-1">比較結果</h2>
+            <span class="workspace-caption">02 / RESULT</span>
+          </div>
+          <p id="comparison-status" role="status" aria-atomic="true">テキストを入力して「比較する」を押してください。</p>
+          <p id="result-placeholder">ここに行ごとの結果を表示します。</p>
+          <table id="diff-table" hidden>
+            <caption class="visually-hidden">行単位の比較結果。変更前と変更後の行番号、追加・削除・変更なしを表示します。</caption>
+            <thead><tr><th scope="col">変更</th><th scope="col">前</th><th scope="col">後</th><th scope="col">テキスト</th></tr></thead>
+            <tbody id="diff-rows"></tbody>
+          </table>
+          <details class="semantics">
+            <summary>比較のルール</summary>
+            <p>CRLFとCRはLFとして扱います。空の入力は0行、末尾の改行は最後の空行です。空白・大文字小文字は区別します。文字数は改行を統一した後のUTF-16単位（絵文字などは2文字以上）です。</p>
+            <p>同じ行をできるだけ多く残し、置換は削除と追加で表示します。同じ行の繰り返しで候補が並ぶ場合は、変更前の削除を先に選びます。編集・サンプル・クリアで古い結果を消します。</p>
+          </details>
         </section>
       </main>
 

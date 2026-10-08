@@ -28,9 +28,9 @@ jobs:
           node-version: '24'
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Lint bootstrap sources
+      - name: Lint sources
         run: npm run lint
-      - name: Test bootstrap build and server
+      - name: Test line comparison, build and server
         run: npm test
       - name: Build static page
         run: npm run build

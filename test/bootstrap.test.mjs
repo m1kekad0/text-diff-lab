@@ -4,15 +4,15 @@ import { mkdtemp, readFile, readdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { once } from 'node:events';
-import { build, sourceDirectory } from '../scripts/build.mjs';
+import { assets, build, sourceDirectory } from '../scripts/build.mjs';
 import { createStaticServer } from '../scripts/serve.mjs';
 
-test('bootstrap: build and serve only the intended static assets', async (t) => {
+test('build and serve only the intended static assets', async (t) => {
   const directory = await mkdtemp(join(tmpdir(), 'text-diff-bootstrap-'));
   t.after(() => rm(directory, { recursive: true, force: true }));
   await build(directory);
-  assert.deepEqual((await readdir(directory)).sort(), ['index.html', 'styles.css']);
-  for (const asset of ['index.html', 'styles.css']) {
+  assert.deepEqual((await readdir(directory)).sort(), [...assets].sort());
+  for (const asset of assets) {
     assert.deepEqual(await readFile(join(directory, asset)), await readFile(join(sourceDirectory, asset)));
   }
 
@@ -22,14 +22,16 @@ test('bootstrap: build and serve only the intended static assets', async (t) => 
   await once(server, 'listening');
   const url = `http://127.0.0.1:${server.address().port}`;
 
-  await t.test('HTML and CSS arrive intact with correct content types', async () => {
-    for (const [path, asset, type] of [['/', 'index.html', 'text/html'], ['/styles.css', 'styles.css', 'text/css']]) {
+  await t.test('HTML, CSS and browser modules arrive intact with correct content types', async () => {
+    for (const [path, asset, type] of [['/', 'index.html', 'text/html'], ['/styles.css', 'styles.css', 'text/css'], ['/app.mjs', 'app.mjs', 'text/javascript'], ['/diff.mjs', 'diff.mjs', 'text/javascript']]) {
       const response = await fetch(`${url}${path}`);
       assert.equal(response.status, 200);
       assert.ok(response.headers.get('content-type').startsWith(type));
       assert.equal(await response.text(), await readFile(join(directory, asset), 'utf8'));
       assert.equal(response.headers.get('x-content-type-options'), 'nosniff');
       assert.ok(response.headers.get('content-security-policy').includes("default-src 'none'"));
+      assert.ok(response.headers.get('content-security-policy').includes("script-src 'self'"));
+      assert.ok(response.headers.get('content-security-policy').includes("connect-src 'none'"));
     }
   });
 
