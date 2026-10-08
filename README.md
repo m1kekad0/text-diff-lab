@@ -4,6 +4,8 @@
 
 **MVP / 行単位の比較** — 左右に入力して「比較する」を押すと、追加・削除・変更なしを色・記号・文字で表示します。合成テキストのサンプルとクリアも使えます。
 
+[v0.1.0 source Release](https://github.com/m1kekad0/text-diff-lab/releases/tag/v0.1.0) は公開済みです（`6e709f36b58093dffb00b91b0fc6a32eced511a0`）。Webサイトはまだ公開していません。公開予定URLは `https://m1kekad0.github.io/text-diff-lab/` です。今回の [Pages準備・Human手順](docs/pages-hosting.md) は手動workflowと静的配信用CSPの準備だけで、mergeしても自動公開しません。
+
 ## 起動と検証
 
 Node.js 24 と npm を使用します。アプリ・CIのnpm依存はありません。
@@ -42,16 +44,18 @@ CIはpull requestとmainへのpushで同じlint・test・buildを順に実行し
 
 ## 入力の扱い
 
-入力処理はブラウザのメモリ内だけです。永続保存・入力送信・API・DB・アカウント・テレメトリー・デプロイはありません。再読込でアプリの状態は初期化されます。HTMLに見える文字も `textContent` で文字として表示します。外部フォント・第三者素材は使いません。
+入力処理はブラウザのメモリ内だけです。永続保存・入力送信・API・DB・アカウント・テレメトリーはありません。再読込でアプリの状態は初期化されます。HTMLに見える文字も `textContent` で文字として表示します。外部フォント・第三者素材は使いません。
 
-ローカルサーバーは指定した静的ファイルだけをGET/HEADで配信し、CSPで同一オリジンのスクリプトだけを許可します。`connect-src 'none'` によりアプリからのデータ接続を禁止します。
+ローカルサーバーは指定した静的ファイルだけをGET/HEADで配信します。HTMLの早期meta CSPは同一オリジンのスクリプト・CSS・画像だけを許可し、`connect-src 'none'` でfetchなどの接続を禁止します。metaでは `frame-ancestors` などのヘッダー専用の保護を引き継げません。静的ホストの応答ヘッダーは別途確認が必要です。[CSPの範囲と制限](docs/pages-hosting.md#静的配信のcspと入力の扱い) を参照してください。
+
+Pages公開後はHTMLなどの取得リクエストがGitHubに届き、訪問者のIPアドレスはセキュリティ目的で記録されます。「入力を送信しない」は「ホストがログを持たない」という意味ではありません。[GitHub公式のデータ収集説明](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection)
 
 ## 公開作業
 
 不具合報告からHuman merge後の確認までを [貢献・公開作業チェックリスト](docs/contributing.md) にまとめています。実入力や私的な情報は公開せず、合成例を使ってください。エージェント向けの作業指示は [AGENTS.md](AGENTS.md) を参照してください。
 
-初回のsource release候補については [v0.1.0準備確認・Release notes下書き](docs/release-readiness.md) を参照してください。タグ・Releaseの公開はHumanが判断します。
+公開済みsource Releaseの準備記録は [v0.1.0準備確認・Release notes下書き](docs/release-readiness.md) にあります。Webサイトの初回公開には、設定変更と初回実行それぞれの別途Human確認が必要です。
 
 ## ライセンス
 
-このリポジトリの新規自作部分は [MIT](LICENSE)、Copyright (c) 2026 m1kekad0。第三者の素材・ツールにはそれぞれのライセンスが適用されます。CIで利用する `actions/checkout` と `actions/setup-node` はMITライセンスの公式Actionsです。
+このリポジトリの新規自作部分は [MIT](LICENSE)、Copyright (c) 2026 m1kekad0。第三者の素材・ツールにはそれぞれのライセンスが適用されます。workflowで利用する `actions/checkout`、`actions/setup-node`、`actions/upload-pages-artifact`、`actions/deploy-pages` はMITライセンスの公式Actionsです。
