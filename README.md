@@ -48,7 +48,7 @@ CIはpull requestとmainへのpushで同じlint・test・buildを順に実行し
 
 ## 公開作業
 
-作業ブランチから通常pushし、検証と独立レビューを経てDraft PRで提示します。mainの更新とmergeはHumanが行います。公開前にcommitの著者情報、文書、ログ、画像、依存とライセンスを点検します。詳しくは [AGENTS.md](AGENTS.md) を参照してください。
+不具合報告からHuman merge後の確認までを [貢献・公開作業チェックリスト](docs/contributing.md) にまとめています。実入力や私的な情報は公開せず、合成例を使ってください。エージェント向けの作業指示は [AGENTS.md](AGENTS.md) を参照してください。
 
 ## ライセンス
 
