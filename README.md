@@ -50,6 +50,8 @@ CIはpull requestとmainへのpushで同じlint・test・buildを順に実行し
 
 不具合報告からHuman merge後の確認までを [貢献・公開作業チェックリスト](docs/contributing.md) にまとめています。実入力や私的な情報は公開せず、合成例を使ってください。エージェント向けの作業指示は [AGENTS.md](AGENTS.md) を参照してください。
 
+初回のsource release候補については [v0.1.0準備確認・Release notes下書き](docs/release-readiness.md) を参照してください。タグ・Releaseの公開はHumanが判断します。
+
 ## ライセンス
 
 このリポジトリの新規自作部分は [MIT](LICENSE)、Copyright (c) 2026 m1kekad0。第三者の素材・ツールにはそれぞれのライセンスが適用されます。CIで利用する `actions/checkout` と `actions/setup-node` はMITライセンスの公式Actionsです。

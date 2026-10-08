@@ -32,6 +32,8 @@ npm run build
 
 ## 外部forkからのPRを確認するとき
 
+[合成3ケースの机上確認](fork-review-tabletop.md) で、この手順をどう使うか確認できます。
+
 - [ ] workflowの実行承認前に、最新HEADの全差分を読む。`.github/workflows/` だけでなく、`package.json`、lockfile、`scripts/`、テスト、そこから呼ばれるコードも確認する。既存CIもPRのコードを実行するため、文書変更という説明だけでは判断しない。
 - [ ] 未信頼のforkコードはローカルでも実行しない。実行承認はHumanが内容を確認して判断する。判断できなければ保留し、承認設定を緩めない。[GitHubのfork workflow承認ガイド](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/approve-runs-from-forks) も参照する。
 
