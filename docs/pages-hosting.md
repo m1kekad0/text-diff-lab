@@ -1,6 +1,18 @@
-# GitHub Pages公開準備とHuman手順
+# GitHub Pages公開記録とHuman手順
 
-この変更は公開準備だけです。Webサイトは未公開、予定URLは `https://m1kekad0.github.io/text-diff-lab/` です。公開済み [v0.1.0 source Release](https://github.com/m1kekad0/text-diff-lab/releases/tag/v0.1.0)（`6e709f36b58093dffb00b91b0fc6a32eced511a0`）とWeb公開は別です。tag・Releaseは変更しません。
+**公開サイト: [text-diff-lab](https://m1kekad0.github.io/text-diff-lab/)**。初回デプロイは2026-10-08 15:05 UTC（2026-10-09 00:05 JST）に成功しました。source Release・デプロイ元・その後のmainは別の参照です。
+
+| 対象 | 記録 |
+| --- | --- |
+| 公開済み [v0.1.0 source Release](https://github.com/m1kekad0/text-diff-lab/releases/tag/v0.1.0) | `6e709f36b58093dffb00b91b0fc6a32eced511a0`（tag・Releaseの参照は維持） |
+| 初回成功run | [37793469753](https://github.com/m1kekad0/text-diff-lab/actions/runs/37793469753)（`workflow_dispatch`、build・deploy成功） |
+| 初回デプロイ元SHA | `74dd1449195da93595373495e33a2fa87ee117a6` |
+| 初回runのartifact | `github-pages`、ID `11557048101`（保持1日） |
+| この文書更新のbase main | `8d4c0dd977665103c42a300e8c292e108065f02f`（[PR #7](https://github.com/m1kekad0/text-diff-lab/pull/7) 後。初回デプロイ元からの差分はブラウザ検証スクリプト・検証文書のみ） |
+
+初回公開後、公開4ファイルがHTTP 200で取得でき、artifactとデプロイ元の `src/` にバイト単位で一致することを確認しました。macOSの使い捨てChromium 151.0.7922.34、1440×1000・390×844で、合成入力の比較・サンプル・編集による結果解除・クリア・上限・エラーを確認しました。非空の両入力を比較した状態からの再読込で入力・結果が初期化されることも確認しています。確認した通常操作では追加の通信要求0、storageは空で、meta CSPのprobeは拒否されました。これらは初回公開サイトの確認範囲で、全ブラウザ・実機・ホストのログや安全性全般の保証ではありません。
+
+過去のローカルMVPスクリプトではクリア後のreloadしか確認していませんでした。[PR #7の訂正と回帰チェック](browser-reset-verification.md#過去のreload検証の訂正) と、上記の公開サイト確認は別の証跡です。bootstrap・MVP・source Releaseの過去の記録を公開サイトのQAに読み替えません。
 
 ## 手動workflowの範囲
 
@@ -27,20 +39,24 @@ default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect
 
 同一オリジンのmodule/CSS/画像を許可し、inline script/style、外部asset、fetch/XHR/WebSocket/sendBeacon、base変更、form送信を制限します。`'self'` はorigin単位で、project subpathへの限定ではありません。CSPは防御の一層です。入力は `textContent` とtextareaの値で扱い、ブラウザメモリ内だけで比較します。backend・保存・telemetry・外部素材・CSP報告先は追加しません。
 
-metaでは `frame-ancestors`、`sandbox`、`report-uri`、Report-Onlyを利用できません。特にローカルの `frame-ancestors 'none'` による埋め込み防止と同等とは言えません。meta前のresourceにも適用されません。`X-Content-Type-Options: nosniff` と `Cache-Control: no-store` もHTMLで代替できず、Pages側ヘッダー・cacheの挙動は初回公開後に別途確認します。[W3C CSP3 §3.3（Working Draft）のmeta制限](https://www.w3.org/TR/CSP3/#meta-element)
+metaでは `frame-ancestors`、`sandbox`、`report-uri`、Report-Onlyを利用できません。特にローカルの `frame-ancestors 'none'` による埋め込み防止と同等とは言えません。meta前のresourceにも適用されません。`X-Content-Type-Options: nosniff` と `Cache-Control: no-store` もHTMLで代替できません。初回公開後の応答では `Cache-Control: max-age=600` を観測し、CSP・`X-Frame-Options`・`X-Content-Type-Options` ヘッダーはありませんでした。今後の公開更新でも実際の応答を確認します。[W3C CSP3 §3.3（Working Draft）のmeta制限](https://www.w3.org/TR/CSP3/#meta-element)
 
 静的ファイル取得はホストに届きます。GitHubは訪問者のIPアドレスをセキュリティ目的で記録するため、「入力送信なし」を「ログなし」と表現しません。[GitHubのデータ収集説明](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection)
 
-## Human設定・初回公開チェックリスト
+## Human設定・初回公開の手順（実施済み履歴）
 
-設定変更の承認と初回公開の承認は、この準備PRとは別に必要です。以下は未実施の手順です。
+初回公開は上記runで完了しています。以下は当時の手順を参照用に残したものです。設定変更の承認と初回公開の承認は、準備PRとは別に行います。
 
 1. Humanが差分・固定HEADのCI/独立レビュー・公開する4ファイルを確認し、mergeを判断する。merge後はmerge SHAに対応する既存CIの成功を確認する。mergeだけではWeb公開しない。
 2. **設定変更の別途承認後**、repositoryの **Settings → Pages → Build and deployment → Source: GitHub Actions** を選ぶ。既存 `pages.yml` を使い、自動pushトリガーのテンプレートを追加しない。[公式設定手順](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow)
 3. 初回runの前に **Settings → Environments → github-pages** を作成・確認する。**Deployment branches and tags: Selected branches and tags** でbranch `main` だけを許可し、tagは許可しない。利用可能なら **Required reviewers** にHumanを指定し、admin bypassもHumanが判断する。environmentなしでrunすると自動作成される場合があり、保護設定の代わりにはならない。[公式environment要件](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments#deployment-protection-rules)
 4. sole maintainerが手動実行し唯一のreviewerにもなる場合、**Prevent self-review** を有効にすると本人が承認できず停止する。単独運用なら自己承認を許可したうえで、run開始とdeploy承認をHumanが別々に行う。自己承認を禁止したい場合は別の承認可能なHumanを先に確保する。利用できない保護機能は未確認のまま進めず、Humanが代替運用を決める。[公式self-reviewの制限](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments#required-reviewers)
 5. **初回公開の別途承認後**、公開予定main SHAを記録し、**Actions → Deploy GitHub Pages (manual) → Run workflow → main** をHumanが実行する。runの `head_sha` が承認したSHAと一致すること、build/artifact成功、environmentの対象SHAを確認してdeployを承認する。不一致なら中止する。権限不足時は自動でaccount権限を拡張しない。
-6. deploy成功run・**実際のdeploy SHA**・`page_url` を記録する。予定URLで4assetの取得、比較/サンプル/編集/クリア/再読込、入力送信・保存なし、meta CSPと実際の応答ヘッダーを合成入力で再確認する。成功後に初めてREADMEの未公開表記を別の変更で更新する。
+6. deploy成功run・**実際のdeploy SHA**・`page_url` を記録する。公開URLで4assetの取得、比較/サンプル/編集/クリア/非空入力からの再読込、入力送信・保存なし、meta CSPと実際の応答ヘッダーを合成入力で再確認する。初回の結果は本書冒頭に記録し、READMEの公開状況を今回更新しました。
+
+## 今後の手動公開更新
+
+公開対象のmain SHA、対応するCI・独立レビュー・4ファイルをHumanが確認し、手動実行を承認します。上記手順5・6と同様にrunの `head_sha` と承認したSHAを照合し、build/artifact成功後にHumanがdeployを承認します。不一致・失敗・承認待ちは公開成功と扱いません。設定変更が必要な場合も別途Human承認を得ます。mergeだけでは公開更新されません。
 
 ## ローカル検証
 
