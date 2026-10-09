@@ -18,7 +18,13 @@ npm ci --ignore-scripts --no-audit --no-fund
 npm run lint
 npm test
 npm run build
+npm run check:browser
+npm run check:keyboard
+PAGES_CHECK=1 npm run check:browser
+PAGES_CHECK=1 npm run check:keyboard
 ```
+
+ブラウザの準備、CIの対象範囲、速度計測との区別は [ブラウザCI検証手順](browser-ci-verification.md) を参照してください。既存Chromiumが対応している場合はダウンロード不要です。取得が拒否された環境では再試行や代替取得をせず、未実行として報告します。
 
 - [ ] アプリの表示・操作を変えた場合は、同じ合成入力・viewportで確認し、必要な画像を残す。文書だけの変更は「アプリの表示変更なし」と記載し、画面確認や画像を実施したことにしない。
 - [ ] commitを固定し、実装者とは別のレビュー担当にbase・HEADの完全なSHAと差分を渡す。指摘を修正したら、更新したHEADで検証と独立レビューをやり直す。

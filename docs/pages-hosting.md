@@ -62,6 +62,6 @@ metaでは `frame-ancestors`、`sandbox`、`report-uri`、Report-Onlyを利用�
 
 `npm ci --ignore-scripts --no-audit --no-fund`、`npm run lint`、`npm test`、`npm run build` を実行します。testは早期meta CSP、relative URL、4asset、手動/main guard、権限分離、検証順序、artifact受け渡し、Actions固定を確認します。workflowの静的検査はGitHubでの実際のdeploy成功を証明しません。
 
-Macで別途用意したPlaywrightを `PLAYWRIGHT_MODULE` に指定し、`PAGES_CHECK=1 node scripts/browser-check.mjs` を実行します。アプリ依存やlockfileには追加しません。このmodeは使い捨てChromiumで `/text-diff-lab/` を配信し、既存サーバーのCSPヘッダーを使いません。合成入力だけでasset取得、各操作、上限、HTML風入力の文字表示、再読込による初期化、storage、keyboard/label、CSPの拒否を確認します。外部probeにはネットワーク遮断の予備策を置き、CSPでその前に拒否されることも確認します。
+固定devDependencyのPlaywrightで `PAGES_CHECK=1 npm run check:browser` を実行します。ブラウザ準備と必須CIへの組込みは [ブラウザCI検証手順](browser-ci-verification.md) を参照してください。このmodeは使い捨てChromiumで `/text-diff-lab/` を配信し、既存サーバーのCSPヘッダーを使いません。合成入力だけでasset取得、各操作、上限、HTML風入力の文字表示、再読込による初期化、storage、keyboard/label、CSPの拒否を確認します。外部probeにはネットワーク遮断の予備策を置き、CSPでその前に拒否されることも確認します。
 
 `BASE_SRC` と `CAPTURE_DIR` を指定すれば、mainと変更後の同じ合成入力・viewport（desktop/mobile、normal/error/empty）で6組の画像のpixel一致を検査できます。今回のアプリの可視文言・CSS・操作コードは変更しません。個人profile、Firefox/WebKit、実際のPages配信は対象外です。ローカルQAの結果・対象HEAD・独立レビュー・最新CIはDraft PRに記録します。

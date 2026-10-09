@@ -10,7 +10,7 @@
 
 ## 起動と検証
 
-Node.js 24 と npm を使用します。アプリ・CIのnpm依存はありません。
+Node.js 24 と npm を使用します。アプリの実行時npm依存はありません。ブラウザ検証用のdevDependencyはPlaywright `1.62.1` に固定しています。
 
 ```sh
 npm ci --ignore-scripts --no-audit --no-fund
@@ -31,7 +31,18 @@ npm run preview
 - `build`: `src/` のHTML/CSS/ブラウザ用JavaScriptだけを `dist/` へコピーします。
 - `preview`: build済みの `dist/` を同じローカルURLで配信します。先にdevサーバーを終了してください。
 
-CIはpull requestとmainへのpushで同じlint・test・buildを順に実行します。workflow名は `CI`、job名は `ci`（発行元: GitHub Actions）です。Chromiumでの操作・画面確認は別途実施し、[MVPの検証記録](docs/mvp-verification.md) に残します。
+既存Chromiumが固定版に対応していれば、取得せずに以下を実行できます。
+
+```sh
+npm run check:browser
+npm run check:keyboard
+PAGES_CHECK=1 npm run check:browser
+PAGES_CHECK=1 npm run check:keyboard
+```
+
+CIはpull requestとmainへのpushでlint・test・build、固定版CLIによるChromiumとLinux依存の明示インストール、上記4チェックを順に実行します。workflow名は `CI`、job名は `ci`（発行元: GitHub Actions）です。取得・起動・テスト・timeoutの失敗は必須 `ci` の失敗になります。[CIの対象範囲・再実行手順](docs/browser-ci-verification.md) を参照してください。Pages modeはローカルsubpath配信の検証です。
+
+`npm run check:input-responsiveness` と `PAGES_CHECK=1 npm run check:input-responsiveness` は手動の限定計測用です。1秒/200msの安全停止基準はローカル測定のためで、CIの性能保証には使いません。
 
 ## 比較のルールと上限
 
@@ -67,3 +78,5 @@ PagesではHTMLなどの取得リクエストがGitHubに届き、訪問者のIP
 ## ライセンス
 
 このリポジトリの新規自作部分は [MIT](LICENSE)、Copyright (c) 2026 m1kekad0。第三者の素材・ツールにはそれぞれのライセンスが適用されます。workflowで利用する `actions/checkout`、`actions/setup-node`、`actions/upload-pages-artifact`、`actions/deploy-pages` はMITライセンスの公式Actionsです。
+
+検証用のPlaywrightとplaywright-coreはApache-2.0、Mac限定のoptional依存fseventsはMITです。ライセンス・NOTICEは各インストール済みパッケージに含まれます。これらのツールやブラウザは公開用の `dist/` に含めません。[固定依存の確認記録](docs/browser-ci-verification.md#固定依存と公開情報) に配布元と確認内容を記録しています。

@@ -11,7 +11,13 @@
     "dev": "node scripts/serve.mjs",
     "lint": "node scripts/lint.mjs",
     "test": "node --test",
+    "check:browser": "node scripts/browser-check.mjs",
+    "check:keyboard": "node scripts/keyboard-check.mjs",
+    "check:input-responsiveness": "node scripts/input-responsiveness-check.mjs",
     "build": "node scripts/build.mjs",
     "preview": "node scripts/serve.mjs --dist"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
   }
 }
