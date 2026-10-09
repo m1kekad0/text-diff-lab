@@ -1,10 +1,12 @@
 # text-diff-lab
 
+**公開サイト: [text-diff-lab](https://m1kekad0.github.io/text-diff-lab/)**
+
 ブラウザ内で2つのテキストを行単位で比較する、小さなツールを育てる公開プロジェクトです。
 
 **MVP / 行単位の比較** — 左右に入力して「比較する」を押すと、追加・削除・変更なしを色・記号・文字で表示します。合成テキストのサンプルとクリアも使えます。
 
-[v0.1.0 source Release](https://github.com/m1kekad0/text-diff-lab/releases/tag/v0.1.0) は公開済みです（`6e709f36b58093dffb00b91b0fc6a32eced511a0`）。Webサイトはまだ公開していません。公開予定URLは `https://m1kekad0.github.io/text-diff-lab/` です。今回の [Pages準備・Human手順](docs/pages-hosting.md) は手動workflowと静的配信用CSPの準備だけで、mergeしても自動公開しません。
+[v0.1.0 source Release](https://github.com/m1kekad0/text-diff-lab/releases/tag/v0.1.0) は公開済みです（`6e709f36b58093dffb00b91b0fc6a32eced511a0`）。Webサイトの初回デプロイ元は別のcommitです。[Pages公開記録・Human手順](docs/pages-hosting.md) に対象SHAと確認範囲を記録しています。公開更新は手動workflowで行い、mergeしても自動公開しません。
 
 ## 起動と検証
 
@@ -48,13 +50,13 @@ CIはpull requestとmainへのpushで同じlint・test・buildを順に実行し
 
 ローカルサーバーは指定した静的ファイルだけをGET/HEADで配信します。HTMLの早期meta CSPは同一オリジンのスクリプト・CSS・画像だけを許可し、`connect-src 'none'` でfetchなどの接続を禁止します。metaでは `frame-ancestors` などのヘッダー専用の保護を引き継げません。静的ホストの応答ヘッダーは別途確認が必要です。[CSPの範囲と制限](docs/pages-hosting.md#静的配信のcspと入力の扱い) を参照してください。
 
-Pages公開後はHTMLなどの取得リクエストがGitHubに届き、訪問者のIPアドレスはセキュリティ目的で記録されます。「入力を送信しない」は「ホストがログを持たない」という意味ではありません。[GitHub公式のデータ収集説明](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection)
+PagesではHTMLなどの取得リクエストがGitHubに届き、訪問者のIPアドレスはセキュリティ目的で記録されます。「入力を送信しない」は「ホストがログを持たない」という意味ではありません。[GitHub公式のデータ収集説明](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection)
 
 ## 公開作業
 
 不具合報告からHuman merge後の確認までを [貢献・公開作業チェックリスト](docs/contributing.md) にまとめています。実入力や私的な情報は公開せず、合成例を使ってください。エージェント向けの作業指示は [AGENTS.md](AGENTS.md) を参照してください。
 
-公開済みsource Releaseの準備記録は [v0.1.0準備確認・Release notes下書き](docs/release-readiness.md) にあります。Webサイトの初回公開には、設定変更と初回実行それぞれの別途Human確認が必要です。
+公開済みsource Releaseの準備記録は [v0.1.0準備確認・Release notes下書き](docs/release-readiness.md) にあります。今後のWebサイトの公開更新も、対象SHAの確認と手動実行・deploy承認をHumanが行います。設定変更が必要な場合は別途Human承認が必要です。
 
 ## ライセンス
 
