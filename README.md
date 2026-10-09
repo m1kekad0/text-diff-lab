@@ -48,6 +48,8 @@ CIはpull requestとmainへのpushで同じlint・test・buildを順に実行し
 
 上限付近から100,000文字までの合成入力・エラー表示・クリア復帰・連続入力は、[限定サイズのブラウザ検証](docs/input-responsiveness-verification.md)に記録しています。Playwright/DOMの入力経路を区別しており、実ユーザーのpasteは未確認です。
 
+初回表示からTab / Shift+Tabだけで到達する比較・編集・サンプル・クリアと上限エラーからの復帰は、[キーボード経路の検証](docs/keyboard-verification.md)に記録しています。通常/subpath、デスクトップ/狭いviewportを既存Chromiumで確認します。
+
 ## 入力の扱い
 
 入力処理はブラウザのメモリ内だけです。永続保存・入力送信・API・DB・アカウント・テレメトリーはありません。再読込でアプリの状態は初期化されます。HTMLに見える文字も `textContent` で文字として表示します。外部フォント・第三者素材は使いません。
