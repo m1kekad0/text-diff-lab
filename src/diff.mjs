@@ -1,6 +1,25 @@
 export const MAX_LINES = 100;
 export const MAX_CHARACTERS = 20_000;
 
+// Count normalized UTF-16 code units and lines without creating a string or array.
+export function countText(text) {
+  let characterCount = text.length;
+  let lineCount = text.length === 0 ? 0 : 1;
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i);
+    if (code === 13) {
+      lineCount++;
+      if (text.charCodeAt(i + 1) === 10) {
+        characterCount--;
+        i++;
+      }
+    } else if (code === 10) {
+      lineCount++;
+    }
+  }
+  return { lineCount, characterCount };
+}
+
 export function inspectText(text) {
   const normalized = text.replace(/\r\n?/g, '\n');
   const lines = normalized === '' ? [] : normalized.split('\n');
@@ -16,13 +35,13 @@ export function inputError(input) {
 
 // Longest common subsequence. On a tie, remove from the left first.
 export function compareTexts(original, updated) {
-  const left = inspectText(original);
-  const right = inspectText(updated);
+  const left = countText(original);
+  const right = countText(updated);
   const errors = { original: inputError(left), updated: inputError(right) };
   if (errors.original || errors.updated) return { errors, rows: null };
 
-  const a = left.lines;
-  const b = right.lines;
+  const a = inspectText(original).lines;
+  const b = inspectText(updated).lines;
   const lengths = Array.from({ length: a.length + 1 }, () => new Uint16Array(b.length + 1));
   for (let i = a.length - 1; i >= 0; i--) {
     for (let j = b.length - 1; j >= 0; j--) {

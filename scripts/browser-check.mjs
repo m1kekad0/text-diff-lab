@@ -144,8 +144,11 @@ try {
     ['', ''], ['same\nline', 'same\nline'], ['', 'new'], ['old', ''],
     ['a\nc', 'a\nb\nc'], ['a\nb\nc', 'a\nc'], ['old', 'new'],
     ['a\nb\na', 'b\na\nb'], ['a\r\nb\r', 'a\nb\n'], ['a', 'a\n'],
+    ['a\n\n\nb\n', '\n\na\n\nb\n'],
     [Array(100).fill('x').join('\n'), Array(100).fill('x').join('\n')],
     ['x'.repeat(20_000), 'x'.repeat(20_000)],
+    ['x'.repeat(19_999) + '\r\n', 'x'.repeat(19_999) + '\n'],
+    ['🌱'.repeat(10_000), '🌱'.repeat(10_000)],
     ['', '<script>window.__syntheticExecuted=true</script>\n<img src=x onerror="window.__syntheticExecuted=true">\n& < >'],
   ];
   for (const [a, b] of cases) {
@@ -159,10 +162,30 @@ try {
   for (const [a, b, invalid] of [
     [errorFixture[0], '', 'original'], ['', errorFixture[0], 'updated'],
     ['x'.repeat(20_001), '', 'original'], ['', 'x'.repeat(20_001), 'updated'],
+    ['', '🌱'.repeat(10_000) + 'x', 'updated'],
   ]) {
     await fill(a, b);
     await compare();
     await assertInvalid([a, b], [invalid]);
+  }
+  // Bounded oversized synthetic values: recover while the untouched field is invalid.
+  for (const [index, oversized] of [[0, 'x'.repeat(20_000) + '\n'.repeat(1_000)], [1, 'x'.repeat(20_000) + '\r\n'.repeat(1_000)]]) {
+    const values = ['合成左', '合成右'].with(index, oversized);
+    await fill(...values);
+    await compare();
+    await assertInvalid(values, [ids[index]]);
+    assert.equal(await page.locator(`#${ids[index]}-error`).textContent(), '100行以内にしてください（現在1001行）。 20,000文字以内にしてください（現在21,000文字）。');
+    const edited = values.with(1 - index, 'もう一方を編集');
+    await page.locator(`#${ids[1 - index]}`).fill(edited[1 - index]);
+    await assertReset(edited, messages.edited);
+    await compare();
+    await assertInvalid(edited, [ids[index]]);
+    await page.locator('#clear').click();
+    await assertReset(['', ''], messages.cleared);
+    await page.locator('#sample').click();
+    await assertReset(sample, messages.sample);
+    await compare();
+    await assertComparison(sample);
   }
   const bothInvalid = [errorFixture[0], 'x'.repeat(20_001)];
   // Editing either field clears both old errors; compare revalidates the untouched invalid field.

@@ -1,4 +1,4 @@
-import { compareTexts, inspectText } from './diff.mjs';
+import { compareTexts, countText } from './diff.mjs';
 
 const original = document.querySelector('#original');
 const updated = document.querySelector('#updated');
@@ -10,7 +10,7 @@ const labels = { added: '+ 追加', removed: '− 削除', unchanged: '= 変更�
 
 function updateCounts() {
   for (const field of [original, updated]) {
-    const input = inspectText(field.value);
+    const input = countText(field.value);
     document.querySelector(`#${field.id}-count`).textContent = `${input.lineCount} / 100行 · ${input.characterCount.toLocaleString('ja-JP')} / 20,000文字`;
   }
 }
