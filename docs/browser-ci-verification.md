@@ -26,7 +26,7 @@ Playwright `1.62.1` をexact-pinned devDependencyに追加し、lockfileで公�
 4. `npm run check:browser`、`npm run check:keyboard`
 5. `PAGES_CHECK=1` で同じ比較・キーボードチェック
 
-GitHub-hosted `ubuntu-latest` 上の手順3で、固定版に対応するChromiumと必要なLinux依存を明示インストールします。[Playwright公式CI手順](https://playwright.dev/docs/ci)と[ブラウザ準備手順](https://playwright.dev/docs/browsers)に従い、ブラウザキャッシュや代替ダウンロード設定は追加しません。
+GitHub-hosted `ubuntu-24.04` 上の手順3で、固定版に対応するChromiumと必要なLinux依存を明示インストールします。OSのmajor版も固定し、[ubuntu-latestのUbuntu 26移行予告](https://github.com/actions/runner-images/issues/14748)による検証環境の自動切替を避けます。runner imageの更新やOS依存のパッチ版までは固定せず、完全なbit単位の再現性を主張しません。[Playwright公式CI手順](https://playwright.dev/docs/ci)と[ブラウザ準備手順](https://playwright.dev/docs/browsers)に従い、ブラウザキャッシュや代替ダウンロード設定は追加しません。
 
 | チェック | CIで確認する範囲 |
 | --- | --- |
