@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { compareTexts, inspectText } from '../src/diff.mjs';
+import { compareTexts, countText, inspectText } from '../src/diff.mjs';
 
 const kinds = (a, b) => compareTexts(a, b).rows.map((row) => row.kind);
 
@@ -23,6 +23,74 @@ test('normalize CRLF and CR, preserve blank lines and final newline', () => {
   assert.deepEqual(kinds('a\n', 'a'), ['unchanged', 'removed']);
   assert.deepEqual(kinds('\n', ''), ['removed', 'removed']);
   assert.equal(inspectText('🌱').characterCount, 2);
+});
+
+test('counts match normalization for exhaustive short CR, LF and Unicode inputs', () => {
+  const alphabet = ['x', '\r', '\n', '日', '🌱', '\u0301', '\u2028', '\ud800'];
+  const check = (text, remaining) => {
+    const normalized = text.replace(/\r\n?/g, '\n');
+    const expected = { lineCount: normalized === '' ? 0 : normalized.split('\n').length, characterCount: normalized.length };
+    assert.deepEqual(countText(text), expected);
+    const { lineCount, characterCount } = inspectText(text);
+    assert.deepEqual({ lineCount, characterCount }, expected);
+    if (remaining) for (const token of alphabet) check(text + token, remaining - 1);
+  };
+  check('', 5);
+});
+
+test('normalized character boundaries keep CRLF and UTF-16 semantics', () => {
+  const crlf = 'x'.repeat(19_999) + '\r\n';
+  assert.deepEqual(countText(crlf), { lineCount: 2, characterCount: 20_000 });
+  assert.equal(compareTexts(crlf, '').rows.length, 2);
+  const emoji = '🌱'.repeat(10_000);
+  assert.deepEqual(countText(emoji), { lineCount: 1, characterCount: 20_000 });
+  assert.equal(compareTexts(emoji, '').rows.length, 1);
+  assert.deepEqual(compareTexts('', emoji + 'x'), {
+    errors: { original: '', updated: '20,000文字以内にしてください（現在20,001文字）。' }, rows: null,
+  });
+});
+
+test('bounded oversized newline inputs report full counts and both errors without rows', () => {
+  for (const newline of ['\n', '\r\n', '\r']) {
+    const text = newline.repeat(100_000);
+    assert.deepEqual(countText(text), { lineCount: 100_001, characterCount: 100_000 });
+    assert.deepEqual(compareTexts(text, text), {
+      errors: {
+        original: '100行以内にしてください（現在100001行）。 20,000文字以内にしてください（現在100,000文字）。',
+        updated: '100行以内にしてください（現在100001行）。 20,000文字以内にしてください（現在100,000文字）。',
+      }, rows: null,
+    });
+  }
+});
+
+test('rejected comparisons do not normalize or split either input', () => {
+  const replace = String.prototype.replace;
+  const split = String.prototype.split;
+  let materializations = 0;
+  try {
+    String.prototype.replace = function (...args) { materializations++; return replace.apply(this, args); };
+    String.prototype.split = function (...args) { materializations++; return split.apply(this, args); };
+    assert.equal(compareTexts('ok\r\n', '\n'.repeat(100)).rows, null);
+    assert.equal(compareTexts('x'.repeat(20_001), 'ok\r\n').rows, null);
+  } finally {
+    String.prototype.replace = replace;
+    String.prototype.split = split;
+  }
+  assert.equal(materializations, 0);
+});
+
+test('repeated blank lines reconstruct both normalized inputs and line numbers', () => {
+  const inputs = ['', '\n', '\n\n', '\r\n\r\n', 'a\n\n\nb\n', '\r\ra\r\nb\r'];
+  for (const original of inputs) {
+    for (const updated of inputs) {
+      const rows = compareTexts(original, updated).rows;
+      for (const [text, excluded, key] of [[original, 'added', 'originalLine'], [updated, 'removed', 'updatedLine']]) {
+        const side = rows.filter((row) => row.kind !== excluded);
+        assert.deepEqual(side.map((row) => row.text), inspectText(text).lines);
+        assert.deepEqual(side.map((row) => row[key]), side.map((_, i) => i + 1));
+      }
+    }
+  }
 });
 
 test('repeated lines have stable alignment, line numbers and deletion-first ties', () => {
