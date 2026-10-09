@@ -3,15 +3,13 @@ import { once } from 'node:events';
 import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { join } from 'node:path';
+import { chromium } from 'playwright';
 import { assets, build } from './build.mjs';
 import { createStaticServer } from './serve.mjs';
 import { compareTexts } from '../src/diff.mjs';
 
-// Playwright is a separately provisioned local verification tool, not an app dependency.
-const moduleName = process.env.PLAYWRIGHT_MODULE || 'playwright';
-const { chromium } = await import(moduleName.startsWith('.') || moduleName.startsWith('/') ? pathToFileURL(resolve(moduleName)).href : moduleName);
+// Use the locked devDependency; browser installation is an explicit setup step.
 const directory = await mkdtemp(join(tmpdir(), 'text-diff-browser-'));
 const servers = [];
 const pagesCheck = process.env.PAGES_CHECK === '1';

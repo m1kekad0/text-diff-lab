@@ -3,15 +3,13 @@ import { once } from 'node:events';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
 import { performance } from 'node:perf_hooks';
-import { pathToFileURL } from 'node:url';
+import { chromium } from 'playwright';
 import { assets, build } from './build.mjs';
 import { createStaticServer } from './serve.mjs';
 
-// Separately provisioned Playwright/Chromium only; never install browsers here.
-const moduleName = process.env.PLAYWRIGHT_MODULE || 'playwright';
-const { chromium } = await import(moduleName.startsWith('.') || moduleName.startsWith('/') ? pathToFileURL(resolve(moduleName)).href : moduleName);
+// Manual measurement with the locked devDependency; never install browsers here.
 const directory = await mkdtemp(join(tmpdir(), 'text-diff-input-'));
 const pagesCheck = process.env.PAGES_CHECK === '1';
 const prefix = pagesCheck ? '/text-diff-lab/' : '/';

@@ -1,5 +1,7 @@
 # キーボード経路の検証
 
+以下の実測はCI組込み前の記録です。現在の固定依存・Linux CI・再実行手順は [ブラウザCI検証手順](browser-ci-verification.md) を参照してください。
+
 2026-10-09 UTC、Mac / Node.js 24.14.0、別途用意済みPlaywright 1.62.1 / Chromium 151.0.7922.34。baseは最新mainの `9bf2bed46f989f6202e8cb04d03b0ce9cae6453c`。PR #10 のmerge SHAと一致し、reviewed head `5b0f8f79202ee667427c87e9317a1dfcb3671b12` と旧main `f43c2f5329fbdee9a14498628e476fda3ae77eed` を祖先に含みます。最終HEADでの再実行・独立レビュー・exact HEAD CIはDraft PR本文に記録します。
 
 ## 方法と既存QAとの差
@@ -35,12 +37,12 @@
 ## 再実行・限界
 
 ```sh
-PLAYWRIGHT_MODULE=../browser-tools/node_modules/playwright/index.mjs node scripts/keyboard-check.mjs
-PAGES_CHECK=1 PLAYWRIGHT_MODULE=../browser-tools/node_modules/playwright/index.mjs node scripts/keyboard-check.mjs
+npm run check:keyboard
+PAGES_CHECK=1 npm run check:keyboard
 ```
 
-`PLAYWRIGHT_MODULE` は既存検証用Playwrightへの相対パスの例です。Chromiumのダウンロードは行いません。`CAPTURE_DIR` は任意のローカル画像保存先で、省略時は画像を作りません。失敗時は非ゼロ終了し、完了した組合せと失敗した組合せ、残りnot-runを出力します。終了時にこのスクリプトのcontext/browser・server・一時buildを片付けます。
+現在は固定devDependencyを直接読み込み、`PLAYWRIGHT_MODULE` による外部モジュール指定は使いません。スクリプト自体はChromiumのダウンロードを行いません。`CAPTURE_DIR` は任意のローカル画像保存先で、省略時は画像を作りません。失敗時は非ゼロ終了し、完了した組合せと失敗した組合せ、残りnot-runを出力します。終了時にこのスクリプトのcontext/browser・server・一時buildを片付けます。
 
-既存 `scripts/browser-check.mjs` の通常/subpath QAと、lint・unit/server・buildは別途実行します。GitHub `CI` / `ci` はlint・unit/server・buildだけを実行し、このローカルChromium検証の成功と同一視しません。
+上記実測時のGitHub `CI` / `ci` はlint・unit/server・buildだけでした。現在は通常/subpathの比較・キーボード回帰も実行します。Mac上の実測とLinux CIの証跡は区別します。
 
 実screen reader、同一テキストのlive region更新が実際にどう発声されるか、実モバイルOS、実paste/IME、Firefox/WebKit、個人ブラウザ設定、公開Pagesの今回の更新はnot-runです。音声の推測だけによるlive region変更や、WCAG全体への適合の主張は行いません。永続保存・送信・公開deployも追加しません。

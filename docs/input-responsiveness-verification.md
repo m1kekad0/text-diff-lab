@@ -1,5 +1,7 @@
 # 限定サイズのブラウザ入力・復帰確認
 
+以下の実測はCI組込み前の記録です。現在の固定依存と再実行手順は [ブラウザCI検証手順](browser-ci-verification.md) を参照してください。速度測定は引き続き手動です。
+
 2026-10-09 UTC、macOS 27.0.1 / arm64、Node.js 24.14.0 / npm 11.9.0、別途用意済みのPlaywright 1.62.1 / Chromium 151.0.7922.34。アプリの検証対象・baseは `f43c2f5329fbdee9a14498628e476fda3ae77eed`。この変更は検証スクリプトと文書だけで、`src/`・依存・CI・配信設定を変更しません。最終HEADの再実行、独立レビュー、exact HEADのPR CIはDraft PR本文に記録します。
 
 ## 方法と停止基準
@@ -66,11 +68,11 @@ fixtureは小さいものから順に、最大100,000 UTF-16 code units・改行
 ## 再実行・未確認範囲
 
 ```sh
-PLAYWRIGHT_MODULE=../browser-tools/node_modules/playwright/index.mjs node scripts/input-responsiveness-check.mjs
-PAGES_CHECK=1 PLAYWRIGHT_MODULE=../browser-tools/node_modules/playwright/index.mjs node scripts/input-responsiveness-check.mjs
+npm run check:input-responsiveness
+PAGES_CHECK=1 npm run check:input-responsiveness
 ```
 
-Playwrightは既存の別検証用ディレクトリを指定します。アプリ依存・workflowに追加せず、Chromiumのダウンロードを行いません。最終JSONには方法別のevent数・trusted/type、操作wall time・同期区間・frame待機を出力します。既存の `scripts/browser-check.mjs` による通常/subpathの機能・keyboard/focus・reset・CSP QAも別途実行します。
+現在は固定devDependencyを直接読み込み、`PLAYWRIGHT_MODULE` による外部モジュール指定は使いません。スクリプトはChromiumのダウンロードを行いません。最終JSONには方法別のevent数・trusted/type、操作wall time・同期区間・frame待機を出力します。通常/subpathの機能・keyboard/focus・reset・CSP QAは必須CIでも実行し、この限定計測は手動のままにします。
 
 初回sandbox内は `listen EPERM` でsetupが `failed`、全入力ケースは `not-run` でした。許可されたMac上のループバック・隔離Chromiumで再実行した上記結果と区別します。
 
