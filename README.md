@@ -10,7 +10,7 @@
 
 ## 起動と検証
 
-Node.js 24 と npm を使用します。アプリの実行時npm依存はありません。ブラウザ検証用のdevDependencyはPlaywright `1.62.1` に固定しています。
+Node.js 24 と npm を使用します。アプリの実行時npm依存はありません。ブラウザ検証用のdevDependencyはPlaywright `1.64.0` に固定しています。
 
 ```sh
 npm ci --ignore-scripts --no-audit --no-fund
@@ -31,7 +31,7 @@ npm run preview
 - `build`: `src/` のHTML/CSS/ブラウザ用JavaScriptだけを `dist/` へコピーします。
 - `preview`: build済みの `dist/` を同じローカルURLで配信します。先にdevサーバーを終了してください。
 
-既存Chromiumが固定版に対応していれば、取得せずに以下を実行できます。
+新規環境の依存導入・ブラウザ取得計画・明示的な準備は [ブラウザセットアップ手順](docs/browser-setup.md) を参照してください。対応するChromium headless shellが既にあれば、取得せずに以下を実行できます。
 
 ```sh
 npm run check:browser

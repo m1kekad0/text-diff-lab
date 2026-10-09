@@ -2,6 +2,8 @@
 
 2026-10-09 UTC。baseは `765ad9cd207fb3e1f8c2d8fc7774f10cb269f398`。アプリの `src/`、公開用の4asset、表示・操作仕様は変更しません。最終HEADでのローカル検証・独立レビュー・Linux CIのrun URLと各stepの結果はDraft PR本文に記録します。
 
+以下の固定版・取得記録はPR #12時点の履歴です。現在の固定版と新規環境の準備は [ブラウザセットアップ手順](browser-setup.md) を参照してください。通常/Pagesの4チェックとCIの実行順は引き続き同じです。
+
 ## 固定依存と公開情報
 
 Playwright `1.62.1` をexact-pinned devDependencyに追加し、lockfileで公式 `registry.npmjs.org` のtarball URLとintegrityを固定します。既存手動QAと同じ公開安定版を選びました。確認時のlatestは `1.64.0` ですが、自動更新は行いません。Node.js要件は `>=20` で、プロジェクトのNode.js 24と互換です。
