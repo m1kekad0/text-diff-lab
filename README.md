@@ -31,6 +31,8 @@ npm run preview
 - `build`: `src/` のHTML/CSS/ブラウザ用JavaScriptだけを `dist/` へコピーします。
 - `preview`: build済みの `dist/` を同じローカルURLで配信します。先にdevサーバーを終了してください。
 
+buildの成功時、出力先は `index.html`・`styles.css`・`app.mjs`・`diff.mjs` の4ファイルだけになります。再buildは既存の通常ファイルを更新しますが、許可外のファイル・ディレクトリ、出力先自体のsymlink、asset名のsymlink・hard link・ディレクトリがある場合は、既存assetを書き換える前に失敗します。余分な項目は自動削除しません。失敗した出力先を公開せず、必要なデータを保持したまま別の空ディレクトリを選んでください。スクリプトから `build(destination)` を呼ぶ場合は、`dist/` またはproject外の専用ディレクトリを使い、親ディレクトリを先に用意します。親のsymlinkは実体パスで境界を確認し、projectの別ディレクトリや祖先への出力を拒否します。同じ出力先を変更する処理との並行実行や、I/O失敗時の全asset一括更新は保証しません。
+
 新規環境の依存導入・ブラウザ取得計画・明示的な準備は [ブラウザセットアップ手順](docs/browser-setup.md) を参照してください。対応するChromium headless shellが既にあれば、取得せずに以下を実行できます。
 
 ```sh
