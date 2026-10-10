@@ -4,6 +4,18 @@ import { compareTexts, countText, inspectText } from '../src/diff.mjs';
 
 const kinds = (a, b) => compareTexts(a, b).rows.map((row) => row.kind);
 
+const assertComparison = (a, b, message) => {
+  const { errors, rows } = compareTexts(a.join('\n'), b.join('\n'));
+  assert.deepEqual(errors, { original: '', updated: '' }, message);
+  for (const [lines, excluded, key] of [[a, 'added', 'originalLine'], [b, 'removed', 'updatedLine']]) {
+    const side = rows.filter((row) => row.kind !== excluded);
+    assert.deepEqual(side.map((row) => row.text), lines, message);
+    assert.deepEqual(side.map((row) => row[key]), lines.map((_, i) => i + 1), message);
+    assert.ok(rows.filter((row) => row.kind === excluded).every((row) => row[key] === null), message);
+  }
+  return rows;
+};
+
 test('empty, identical, insert, delete and replacement', () => {
   assert.deepEqual(compareTexts('', '').rows, []);
   assert.deepEqual(kinds('one\ntwo', 'one\ntwo'), ['unchanged', 'unchanged']);
@@ -144,6 +156,58 @@ test('exhaustive small inputs reconstruct both sides with a minimal edit count',
       assert.equal(rows.filter((row) => row.kind !== 'unchanged').length, a.length + b.length - 2 * longest);
       assert.deepEqual(rows.filter((row) => row.originalLine !== null).map((row) => row.originalLine), a.map((_, i) => i + 1));
       assert.deepEqual(rows.filter((row) => row.updatedLine !== null).map((row) => row.updatedLine), b.map((_, i) => i + 1));
+    }
+  }
+});
+
+test('100 entirely different lines produce 200 rows with deletion-first ordering', () => {
+  const a = Array.from({ length: 100 }, (_, i) => `original-${i}`);
+  const b = Array.from({ length: 100 }, (_, i) => `updated-${i}`);
+  const rows = assertComparison(a, b);
+  assert.deepEqual(rows, [
+    ...a.map((text, i) => ({ kind: 'removed', text, originalLine: i + 1, updatedLine: null })),
+    ...b.map((text, i) => ({ kind: 'added', text, originalLine: null, updatedLine: i + 1 })),
+  ]);
+});
+
+test('long repeated runs and alternating lines remain minimal at 100 lines per side', () => {
+  const cases = [
+    [Array(50).fill('a').concat(Array(50).fill('b')), Array(50).fill('b').concat(Array(50).fill('a')), 100],
+    [Array.from({ length: 100 }, (_, i) => i % 2 ? 'b' : 'a'), Array.from({ length: 100 }, (_, i) => i % 2 ? 'a' : 'b'), 2],
+  ];
+  for (const [a, b, edits] of cases) {
+    const rows = assertComparison(a, b);
+    assert.equal(rows.filter((row) => row.kind !== 'unchanged').length, edits);
+    assert.deepEqual(rows[0], { kind: 'removed', text: 'a', originalLine: 1, updatedLine: null });
+  }
+});
+
+test('seeded 96–100 line inputs reconstruct both sides with a minimal edit count', () => {
+  // Independent oracle: edit distance with replacement cost 2, using prefix costs.
+  const minimumEdits = (a, b) => {
+    let previous = Array.from({ length: b.length + 1 }, (_, j) => j);
+    for (let i = 0; i < a.length; i++) {
+      const current = [i + 1];
+      for (let j = 0; j < b.length; j++) {
+        current.push(Math.min(current[j] + 1, previous[j + 1] + 1, previous[j] + (a[i] === b[j] ? 0 : 2)));
+      }
+      previous = current;
+    }
+    return previous[b.length];
+  };
+  const seed = 0x5eed;
+  let state = seed;
+  const lines = (length) => Array.from({ length }, () => {
+    state = (Math.imul(state, 1_664_525) + 1_013_904_223) >>> 0;
+    return ['a', 'b', 'c', 'd'][state >>> 30];
+  });
+  for (let left = 96; left <= 100; left++) {
+    for (let right = 96; right <= 100; right++) {
+      const a = lines(left);
+      const b = lines(right);
+      const message = `seed=${seed}, lengths=${left}/${right}`;
+      const rows = assertComparison(a, b, message);
+      assert.equal(rows.filter((row) => row.kind !== 'unchanged').length, minimumEdits(a, b), message);
     }
   }
 });
