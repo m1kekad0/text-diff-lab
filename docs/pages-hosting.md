@@ -1,6 +1,8 @@
 # GitHub Pages公開記録とHuman手順
 
-**公開サイト: [text-diff-lab](https://m1kekad0.github.io/text-diff-lab/)**。初回デプロイは2026-10-08 15:05 UTC（2026-10-09 00:05 JST）に成功しました。source Release・デプロイ元・その後のmainは別の参照です。
+**公開サイト: [text-diff-lab](https://m1kekad0.github.io/text-diff-lab/)**。初回デプロイは2026-10-08 15:05 UTC（2026-10-09 00:05 JST）に成功しました。最新の成功デプロイは下記の2回目のrunです（2026-10-10 UTC確認）。source Release・デプロイ元・その後のmainは別の参照です。
+
+## 初回公開の記録
 
 | 対象 | 記録 |
 | --- | --- |
@@ -8,11 +10,28 @@
 | 初回成功run | [37793469753](https://github.com/m1kekad0/text-diff-lab/actions/runs/37793469753)（`workflow_dispatch`、build・deploy成功） |
 | 初回デプロイ元SHA | `74dd1449195da93595373495e33a2fa87ee117a6` |
 | 初回runのartifact | `github-pages`、ID `11557048101`（保持1日） |
-| この文書更新のbase main | `8d4c0dd977665103c42a300e8c292e108065f02f`（[PR #7](https://github.com/m1kekad0/text-diff-lab/pull/7) 後。初回デプロイ元からの差分はブラウザ検証スクリプト・検証文書のみ） |
+| 初回公開記録を更新した際のbase main | `8d4c0dd977665103c42a300e8c292e108065f02f`（[PR #7](https://github.com/m1kekad0/text-diff-lab/pull/7) 後。初回デプロイ元からの差分はブラウザ検証スクリプト・検証文書のみ） |
 
 初回公開後、公開4ファイルがHTTP 200で取得でき、artifactとデプロイ元の `src/` にバイト単位で一致することを確認しました。macOSの使い捨てChromium 151.0.7922.34、1440×1000・390×844で、合成入力の比較・サンプル・編集による結果解除・クリア・上限・エラーを確認しました。非空の両入力を比較した状態からの再読込で入力・結果が初期化されることも確認しています。確認した通常操作では追加の通信要求0、storageは空で、meta CSPのprobeは拒否されました。これらは初回公開サイトの確認範囲で、全ブラウザ・実機・ホストのログや安全性全般の保証ではありません。
 
 過去のローカルMVPスクリプトではクリア後のreloadしか確認していませんでした。[PR #7の訂正と回帰チェック](browser-reset-verification.md#過去のreload検証の訂正) と、上記の公開サイト確認は別の証跡です。bootstrap・MVP・source Releaseの過去の記録を公開サイトのQAに読み替えません。
+
+## 2回目の成功デプロイと今回の確認範囲
+
+2026-10-10 UTCにGitHubのPages workflowのrun一覧・対象run・job・deployment statusを再確認しました。成功runは初回と2回目の2件で、最新は次の記録です。
+
+| 対象 | 記録 |
+| --- | --- |
+| 2回目の成功run | [37869169833](https://github.com/m1kekad0/text-diff-lab/actions/runs/37869169833)（run #2、attempt 1、`workflow_dispatch`、`main`、`completed` / `success`） |
+| run開始日時 | 2026-10-09 01:18:50 UTC（01:18 UTC） |
+| デプロイ元SHA | `f43c2f5329fbdee9a14498628e476fda3ae77eed`（runの `head_sha` とdeploymentの `sha` が一致） |
+| 当該runの検証・公開結果 | build jobのlocked install・lint・test・build・artifact uploadが成功。deploy jobも成功し、2026-10-09 01:26:52 UTCに完了 |
+| GitHubのdeployment記録 | ID `6950582835`、`github-pages`、status `success`、公開URLは上記サイト |
+| 今回の文書更新のbase main | `e01447f1146a573db5ec25636ee7694269c6b884`（デプロイ元SHA以降、このbaseまで `src/` を変更したcommitはなく、`src/` のtreeも一致） |
+
+これらは当該runが成功したGitHubの記録です。初回公開後のHTTP 200・4ファイルのバイト一致・ブラウザ操作・入力送信とstorage・CSP・応答ヘッダーの確認は、前節に残した初回時点の結果です。当該Pages workflowにはブラウザ検証stepがなく、build・deploy成功を公開サイトのブラウザQA成功として扱いません。
+
+今回の更新では公開サイトの再取得・ブラウザ操作・入力送信とstorage・CSP・応答ヘッダーを再検証していません。`src/` の無変更だけでは現在の配信内容や応答ヘッダーの一致を保証できません。通常CIのブラウザ検証とその対象SHA・runはPRに別途記録し、公開サイトの再検証と区別します。新たなdeployや公開設定の変更は行いません。
 
 ## 手動workflowの範囲
 
