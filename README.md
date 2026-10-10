@@ -59,7 +59,7 @@ CIはpull requestとmainへのpushでlint・test・build、固定版CLIによる
 
 カウンターと上限確認は、入力全体を走査して数だけを求めます。両入力が上限内の場合だけ正規化文字列と行配列を作ります。余分な配列を減らす改善であり、任意サイズの入力・貼り付けの応答性を保証しません。[回帰確認と限定計測](docs/counts-preflight-verification.md)に確認範囲を記録しています。
 
-上限付近から100,000文字までの合成入力・エラー表示・クリア復帰・連続入力は、[限定サイズのブラウザ検証](docs/input-responsiveness-verification.md)に記録しています。Playwright/DOMの入力経路を区別しており、実ユーザーのpasteは未確認です。
+上限付近から100,000文字までの合成入力・エラー表示・クリア復帰・連続入力は、[限定サイズのブラウザ検証](docs/input-responsiveness-verification.md)に記録しています。Playwright/DOMの入力経路と、公開サイトのGoogle Chrome / macOS標準の日本語入力で小さいサンプルの実Cmd+V貼り付け・IME基本操作が合格したとの[Human報告](docs/input-responsiveness-verification.md#humanによる公開サイト確認2026-10-10-jst)を区別しています。大容量OS貼り付け・上限付近IME・他ブラウザ/OS・実screen readerは未検証です。
 
 初回表示からTab / Shift+Tabだけで到達する比較・編集・サンプル・クリアと上限エラーからの復帰は、[キーボード経路の検証](docs/keyboard-verification.md)に記録しています。通常/subpath、デスクトップ/狭いviewportを既存Chromiumで確認します。
 

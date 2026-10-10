@@ -45,4 +45,6 @@ PAGES_CHECK=1 npm run check:keyboard
 
 上記実測時のGitHub `CI` / `ci` はlint・unit/server・buildだけでした。現在は通常/subpathの比較・キーボード回帰も実行します。Mac上の実測とLinux CIの証跡は区別します。
 
-実screen reader、同一テキストのlive region更新が実際にどう発声されるか、実モバイルOS、実paste/IME、Firefox/WebKit、個人ブラウザ設定、公開Pagesの今回の更新はnot-runです。音声の推測だけによるlive region変更や、WCAG全体への適合の主張は行いません。永続保存・送信・公開deployも追加しません。
+上記の自動検証では実screen reader、同一テキストのlive region更新が実際にどう発声されるか、実モバイルOS、実paste/IME、Firefox/WebKit、個人ブラウザ設定、公開Pagesの更新はnot-runです。
+
+別途、2026-10-10 JSTに公開サイトのGoogle Chrome / macOS標準の日本語入力で、小さいサンプルの実Cmd+V貼り付け、IME変換確定・候補取消、クリア・再比較が合格したとのHuman報告を得ました。[手順・結果・参照deployと証跡の区別](input-responsiveness-verification.md#humanによる公開サイト確認2026-10-10-jst) を参照してください。ブラウザ・OSのバージョンは未取得で、自動実行ログや画像による証跡ではありません。大容量OS貼り付け・上限付近IME・IMEのその他の動作・他ブラウザ/OS・実screen readerは引き続き未検証です。音声の推測だけによるlive region変更や、WCAG全体への適合の主張は行いません。今回の文書更新で永続保存・送信・公開deployも追加しません。
