@@ -26,7 +26,9 @@ copy or redistribution of the vendored rules.
 1. Select an explicit upstream commit and check its license and required
    notices.
 2. Retrieve `AGENTS.md` and `LICENSE` using `raw.githubusercontent.com` URLs
-   containing that full commit SHA. Preserve the bytes without formatting or
+   containing that full commit SHA. If the upstream repository is private,
+   retrieve them with the GitHub contents API (raw media type) using
+   `ref=<full commit SHA>` instead. Preserve the bytes without formatting or
    other edits.
 3. Recheck the fixed commit, compare the retrieved and vendored bytes, and run
    `wc -c` and `sha256sum` on `vendor/ai-agent-rules/AGENTS.md` and
