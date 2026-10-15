@@ -13,8 +13,9 @@
 - License bytes: `1065`
 - License SHA256: `e0aea83bf0d07947ffd8caa4270006d6f432a2a05fc83e75770fc070a9d705b3`
 
-`AGENTS.md` and `LICENSE` are unmodified copies from the commit above, the
-unmerged HEAD of upstream Draft PR #10. The byte counts and SHA256 values were
+`AGENTS.md` and `LICENSE` are unmodified copies from the commit above, which
+is merged into upstream `main` via merge commit `26d527a` (PR #10, merged
+2026-10-15). The byte counts and SHA256 values were
 measured with `wc -c` and `sha256sum`. Keep the `LICENSE` notice with any
 copy or redistribution of the vendored rules.
 
