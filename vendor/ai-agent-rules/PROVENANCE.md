@@ -1,12 +1,12 @@
 # Pinned shared rules
 
 - Upstream URL: https://github.com/m1kekad0/ai-agent-rules
-- Commit: `3c1cae9f799497091e5f61dd27704fa63c3be62d`
+- Commit: `2c9adf1966ee71221fdd5fa19886314822558d87`
 - Path: `AGENTS.md`
-- Canonical retrieval: https://raw.githubusercontent.com/m1kekad0/ai-agent-rules/3c1cae9f799497091e5f61dd27704fa63c3be62d/AGENTS.md
+- Canonical retrieval: https://raw.githubusercontent.com/m1kekad0/ai-agent-rules/2c9adf1966ee71221fdd5fa19886314822558d87/AGENTS.md
 - Retrieval date: 2026-10-15 UTC
-- Bytes: `5638`
-- SHA256: `e3938c1853a74758728e2a9956a3425e310d6449476d06ff96a044ab1896b67d`
+- Bytes: `5914`
+- SHA256: `65305a1834ce55d602e900384980f65beb180ac9ce2df515486a5b06882ae8ea`
 - License: MIT (Copyright (c) 2026 m1kekad0), confirmed 2026-10-15
 - License file: `LICENSE` from the same commit, vendored unmodified as
   `vendor/ai-agent-rules/LICENSE`
@@ -14,7 +14,7 @@
 - License SHA256: `e0aea83bf0d07947ffd8caa4270006d6f432a2a05fc83e75770fc070a9d705b3`
 
 `AGENTS.md` and `LICENSE` are unmodified copies from the commit above, the
-upstream `main` merge commit of PR #11 (merged 2026-10-15). The upstream
+upstream `main` merge commit of PR #12 (merged 2026-10-15). The upstream
 repository is private, so they were retrieved with the GitHub contents API at
 that full commit SHA and compared byte-for-byte with the same commit in a local
 clone. The byte counts and SHA256 values were
