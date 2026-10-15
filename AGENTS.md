@@ -1,5 +1,7 @@
 # Working on text-diff-lab
 
+- Read and apply the pinned shared rules in [vendor/ai-agent-rules/AGENTS.md](vendor/ai-agent-rules/AGENTS.md) alongside this file. Precedence is: platform constraints > user instructions > this file > pinned shared rules. The shared rules do not weaken this project's gates. See [provenance and update instructions](vendor/ai-agent-rules/PROVENANCE.md).
+
 - The browser-local line comparison MVP and CI are implemented. Keep each change within the requested scope; add further features only when requested.
 - Use a separate work branch. Preserve unrelated work and keep changes small enough to review.
 - Before publishing, inspect all outgoing commits and tracked files, including author, committer, coauthor trailers, docs, PR text, logs, and images. Use only approved public identities. Exclude secrets, personal email, identifying local paths, and private material. Use relative paths and synthetic examples in public evidence.
