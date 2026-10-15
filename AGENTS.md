@@ -8,4 +8,5 @@
 - Write project-specific public documentation. Do not copy private rule sets, private links, or other projects' history and evidence. Check redistribution rights and license notices before adding third-party material.
 - Keep text processing in browser memory. Do not add transmission, storage, analytics, services, or deployment outside the requested scope.
 - Run relevant lint, tests, and build. Report what was actually checked and what is still missing. Obtain an independent review of a fixed commit; after changes, verify and review the updated commit.
-- Push normally and open a Draft PR with evidence and limitations. Do not push directly to main, force push, mark Ready, merge, or change repository/account settings. Human decides when to merge.
+- Push normally and open a Draft PR with evidence and limitations. Do not push directly to main, force push, merge, or change repository/account settings.
+- An AI agent may mark a PR "Ready for review" only when all of these hold for the current HEAD: (1) an independent AI review is complete with no open findings, (2) CI has passed, and (3) only final Human confirmation remains. Otherwise keep it Draft. Merge remains Human-only; Human decides when to merge.
