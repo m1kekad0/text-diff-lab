@@ -34,7 +34,7 @@ PAGES_CHECK=1 npm run check:keyboard
 - [ ] 送信対象の全commit、追跡ファイル、著者・committer・coauthor、文書、リンク、ログ、画像とそのメタデータ、PR本文を確認する。公開用の名前・メールを使い、秘密情報・実入力・個人メール・識別可能なローカルパス・私的な資料やリンクを除く。第三者素材を追加する場合は利用権とライセンス表記を確認する。
 - [ ] 作業ブランチを通常pushする。force pushはしない。ローカルHEAD、リモートブランチ、PRのHEADが一致することを確認する。
 - [ ] 日本語のDraft PRに目的・変更・base/HEAD SHA・実施した検証・独立レビューの対象SHAと結果・未確認事項を書く。自動チェックは、そのPRの最新HEADに対応する `CI` / `ci` の結果とrunリンクを確認する。失敗・未実行・承認待ちは成功と扱わない。
-- [ ] DraftでHumanへ提示する。エージェントは [AGENTS.md](../AGENTS.md) の3条件（独立AIレビュー完了・未解決指摘なし、CI成功、Humanの最終確認のみ残る）をすべて満たす場合に限りReady for reviewにしてよい。merge・設定変更は行わない。
+- [ ] DraftでHumanへ提示する。エージェントは [AGENTS.md](../AGENTS.md) の3条件（独立AIレビュー完了・未解決指摘なし、CI成功、Humanの最終確認のみ残る）をすべて満たす場合に限りReady for reviewにしてよい。変更に適用されるCIがない（どのworkflowも起動しない）場合は、独立AIレビュー完了・未解決指摘なしでReady for reviewにしてよい。merge・設定変更は行わない。
 
 ## 外部forkからのPRを確認するとき
 
