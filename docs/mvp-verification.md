@@ -55,4 +55,4 @@ c7871f301deb0fe75d50089528ed13e6e2b4b6efc254ed2ecb619a55e0143c64  src/app.mjs
 - 入力編集後は前回結果を消すと、どの入力の結果か迷わない。
 - 比較画像は同じfixtureとviewportを使い、固定コミットのコード・レビュー・CIと対応させる。
 
-PRはDraftのまま提示し、Readyへの変更・merge・デプロイは行いません。
+PRはDraftで提示し、[AGENTS.md](../AGENTS.md) の3条件を満たす場合（適用されるCIがない変更では独立AIレビュー完了・未解決指摘なしの場合）に限りエージェントがReady for reviewにできます。merge・デプロイは行いません。
