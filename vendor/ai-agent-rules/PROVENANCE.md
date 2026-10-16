@@ -41,3 +41,7 @@ copy or redistribution of the vendored rules.
 Never present content retrieved from mutable `main` as this fixed version.
 If the pinned source cannot be retrieved or verified, report that limitation
 instead of substituting `main` or claiming verification succeeded.
+
+## Pin check script
+
+`scripts/check-pin.mjs` is an unmodified copy of `scripts/check-pin.mjs` from ai-agent-rules commit `92bfe7f73bcde392ee2c1d66d391d9ace4ac725d` (SHA256 `36e61c41bd1d6cfaf3b39bde945432c75a6d40600c0c6984d421660e3e3583ef`). CI runs `node scripts/check-pin.mjs .` offline; the upstream drift check is not run because no token is configured.
