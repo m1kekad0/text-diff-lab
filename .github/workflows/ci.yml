@@ -26,6 +26,10 @@ jobs:
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: '24'
+      - name: Check vendored ai-agent-rules pin
+        run: node scripts/check-pin.mjs --upstream .
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Lint sources
