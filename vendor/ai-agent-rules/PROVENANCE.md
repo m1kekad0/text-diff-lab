@@ -1,12 +1,12 @@
 # Pinned shared rules
 
 - Upstream URL: https://github.com/m1kekad0/ai-agent-rules
-- Commit: `88e083736f180a7bf267175b25a831af1ef26d76`
+- Commit: `0f93ef2ab87726fbe4c5b46750042b734cf2ba84`
 - Path: `AGENTS.md`
-- Canonical retrieval: https://raw.githubusercontent.com/m1kekad0/ai-agent-rules/88e083736f180a7bf267175b25a831af1ef26d76/AGENTS.md
+- Canonical retrieval: https://raw.githubusercontent.com/m1kekad0/ai-agent-rules/0f93ef2ab87726fbe4c5b46750042b734cf2ba84/AGENTS.md
 - Retrieval date: 2026-10-16 UTC
-- Bytes: `8270`
-- SHA256: `5814acfcaf73fcf28337cf75cc17e7b8316957c3453476b10f50a320aaec9590`
+- Bytes: `9075`
+- SHA256: `73bb018ff5a72d45e80213f3dfbcbec6df2e2383260ef166e209e7578ac84c66`
 - License: MIT (Copyright (c) 2026 m1kekad0), confirmed 2026-10-16
 - License file: `LICENSE` from the same commit, vendored unmodified as
   `vendor/ai-agent-rules/LICENSE`
@@ -14,7 +14,8 @@
 - License SHA256: `e0aea83bf0d07947ffd8caa4270006d6f432a2a05fc83e75770fc070a9d705b3`
 
 `AGENTS.md` and `LICENSE` are unmodified copies from the commit above, the
-initial commit of the public upstream repository (published 2026-10-16). They
+merge commit of upstream PR #2 (2026-10-16). `LICENSE` is unchanged since the
+initial commit. They
 were retrieved from `raw.githubusercontent.com` at that full commit SHA and
 compared byte-for-byte with the same commit in a local clone. The byte counts and SHA256 values were
 measured with `wc -c` and `sha256sum`. Keep the `LICENSE` notice with any
