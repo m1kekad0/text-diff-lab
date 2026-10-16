@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 // ai-agent-rules の vendored pin（PROVENANCE.md の bytes / SHA256）を検査する。読み取り専用・依存なし。
-// 旧 m1kekad0/agent-rules-pin-check（main + PR #1-#3）を移植。
 import { readFile, stat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
